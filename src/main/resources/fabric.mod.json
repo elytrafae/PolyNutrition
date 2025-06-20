@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "polynutrition",
+  "version": "${version}",
+  "name": "PolyNutrition",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "LGPL-3.0",
+  "icon": "assets/polynutrition/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "xyz.elytrafae.mc.polynutrition.Polynutrition"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "polymer-bundled": ">=0.12.6+1.21.5"
+  }
+}
