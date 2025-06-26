@@ -3,6 +3,8 @@ package xyz.elytrafae.mc.polynutrition;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.client.font.Font;
+import net.minecraft.client.font.FontManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.LoreComponent;
@@ -26,9 +28,9 @@ public class Polynutrition implements ModInitializer {
     public static final char SATURATION_SYMBOL = 'b';
     public static final char HUNGER_HALF_SYMBOL = 'c';
     public static final char SATURATION_HALF_SYMBOL = 'd';
-    public static final Style HUNGER_STYLE = Style.EMPTY.withColor(0x773502);
+    public static final Style HUNGER_STYLE = Style.EMPTY.withColor(0x773502).withItalic(false);
     public static final Style COMPLETE_HUNGER_STYLE = HUNGER_STYLE.withFont(Identifier.of(MODID, "food"));
-    public static final Style SATURATION_STYLE = Style.EMPTY.withColor(0xfcf400);
+    public static final Style SATURATION_STYLE = Style.EMPTY.withColor(0xfcf400).withItalic(false);
     public static final Style COMPLETE_SATURATION_STYLE = SATURATION_STYLE.withFont(Identifier.of(MODID, "food"));
     public static final Style WHITE_STYLE = Style.EMPTY.withColor(Formatting.WHITE).withFont(Identifier.ofVanilla("default"));
 
