@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'fabric-loom' version '1.11-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -38,8 +38,8 @@ dependencies {
 
 
     //BetterHud API
-    //compileOnly("io.github.toxicity188:BetterHud-standard-api:1.12.2")
-    //modCompileOnly("io.github.toxicity188:BetterHud-fabric-api:1.12.2")
+    //compileOnly("io.github.toxicity188:BetterHud-standard-api:${project.betterhud_version}")
+    //modCompileOnly("io.github.toxicity188:BetterHud-fabric-api:${project.betterhud_version}")
 
     //BetterHud Library
     //compileOnly("io.github.toxicity188:BetterCommand:1.4.1")
