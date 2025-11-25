@@ -9,10 +9,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -23,20 +20,22 @@ public class Polynutrition implements ModInitializer {
 
     public static final String MODID = "polynutrition";
 
+    public static final StyleSpriteSource DEFAULT_FONT = new StyleSpriteSource.Font(Identifier.ofVanilla("default"));
+    public static final StyleSpriteSource CUSTOM_HUNGER_FONT = new StyleSpriteSource.Font(Identifier.of(MODID, "food"));
     public static final String DEFAULT_HUNGER_SYMBOL = "\uD83C\uDF56";
     public static final char HUNGER_SYMBOL = 'a';
     public static final char SATURATION_SYMBOL = 'b';
     public static final char HUNGER_HALF_SYMBOL = 'c';
     public static final char SATURATION_HALF_SYMBOL = 'd';
     public static final Style HUNGER_STYLE = Style.EMPTY.withColor(0x773502).withItalic(false);
-    public static final Style COMPLETE_HUNGER_STYLE = HUNGER_STYLE.withFont(Identifier.of(MODID, "food"));
+    public static final Style COMPLETE_HUNGER_STYLE = HUNGER_STYLE.withFont(CUSTOM_HUNGER_FONT);
     public static final Style SATURATION_STYLE = Style.EMPTY.withColor(0xfcf400).withItalic(false);
-    public static final Style COMPLETE_SATURATION_STYLE = SATURATION_STYLE.withFont(Identifier.of(MODID, "food"));
-    public static final Style WHITE_STYLE = Style.EMPTY.withColor(Formatting.WHITE).withFont(Identifier.ofVanilla("default"));
+    public static final Style COMPLETE_SATURATION_STYLE = SATURATION_STYLE.withFont(CUSTOM_HUNGER_FONT);
+    public static final Style WHITE_STYLE = Style.EMPTY.withColor(Formatting.WHITE).withFont(DEFAULT_FONT);
 
     @Override
     public void onInitialize() {
-        PolymerItemUtils.ITEM_CHECK.register((stack) -> stack.contains(DataComponentTypes.FOOD));
+        PolymerItemUtils.CONTEXT_ITEM_CHECK.register((stack, packetContext) -> stack.contains(DataComponentTypes.FOOD));
         PolymerItemUtils.ITEM_MODIFICATION_EVENT.register(this::modifyClientItem);
 
         PolymerResourcePackUtils.addModAssets(MODID);
