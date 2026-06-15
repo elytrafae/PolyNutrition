@@ -1,10 +1,10 @@
 # gradle
 
 .gradle/
-gradle/
 build/
 out/
 classes/
+
 # eclipse
 
 *.launch
@@ -31,5 +31,10 @@ bin/
 # fabric
 
 run/
-/run-*/
-/test-mods/
+
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
