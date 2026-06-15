@@ -3,8 +3,9 @@ package xyz.elytrafae.mc.polynutrition;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.font.Font;
-import net.minecraft.client.font.FontManager;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.LoreComponent;
@@ -39,6 +40,11 @@ public class Polynutrition implements ModInitializer {
         PolymerItemUtils.ITEM_MODIFICATION_EVENT.register(this::modifyClientItem);
 
         PolymerResourcePackUtils.addModAssets(MODID);
+
+        ServerPlayerEvents.JOIN.register(HUDManagerInstanceHolder::onJoin);
+        ServerPlayerEvents.LEAVE.register(HUDManagerInstanceHolder::onLeave);
+        ServerPlayerEvents.COPY_FROM.register(HUDManagerInstanceHolder::onCopyData);
+        ServerTickEvents.START_SERVER_TICK.register(HUDManagerInstanceHolder::tickAll);
     }
 
     public ItemStack modifyClientItem(ItemStack original, ItemStack client, PacketContext context) {
