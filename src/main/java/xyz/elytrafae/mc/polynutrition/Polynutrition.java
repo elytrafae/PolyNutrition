@@ -6,14 +6,17 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FoodComponent;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
+import net.fabricmc.fabric.impl.item.DefaultItemComponentImpl;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 
 import java.util.List;
 
@@ -21,8 +24,8 @@ public class Polynutrition implements ModInitializer {
 
     public static final String MODID = "polynutrition";
 
-    public static final StyleSpriteSource DEFAULT_FONT = new StyleSpriteSource.Font(Identifier.ofVanilla("default"));
-    public static final StyleSpriteSource CUSTOM_HUNGER_FONT = new StyleSpriteSource.Font(Identifier.of(MODID, "food"));
+    public static final FontDescription DEFAULT_FONT = new FontDescription.Resource(Identifier.parse("default"));
+    public static final FontDescription CUSTOM_HUNGER_FONT = new FontDescription.Resource(Identifier.fromNamespaceAndPath(MODID, "food"));
     public static final String DEFAULT_HUNGER_SYMBOL = "\uD83C\uDF56";
     public static final char HUNGER_SYMBOL = 'a';
     public static final char SATURATION_SYMBOL = 'b';
@@ -32,11 +35,11 @@ public class Polynutrition implements ModInitializer {
     public static final Style COMPLETE_HUNGER_STYLE = HUNGER_STYLE.withFont(CUSTOM_HUNGER_FONT);
     public static final Style SATURATION_STYLE = Style.EMPTY.withColor(0xfcf400).withItalic(false);
     public static final Style COMPLETE_SATURATION_STYLE = SATURATION_STYLE.withFont(CUSTOM_HUNGER_FONT);
-    public static final Style WHITE_STYLE = Style.EMPTY.withColor(Formatting.WHITE).withFont(DEFAULT_FONT);
+    public static final Style WHITE_STYLE = Style.EMPTY.withColor(ChatFormatting.WHITE).withFont(DEFAULT_FONT);
 
     @Override
     public void onInitialize() {
-        PolymerItemUtils.CONTEXT_ITEM_CHECK.register((stack, packetContext) -> stack.contains(DataComponentTypes.FOOD));
+        PolymerItemUtils.CONTEXT_ITEM_CHECK.register((stack, packetContext) -> stack.get(DataComponents.FOOD) != null);
         PolymerItemUtils.ITEM_MODIFICATION_EVENT.register(this::modifyClientItem);
 
         PolymerResourcePackUtils.addModAssets(MODID);
@@ -48,41 +51,42 @@ public class Polynutrition implements ModInitializer {
     }
 
     public ItemStack modifyClientItem(ItemStack original, ItemStack client, PacketContext context) {
-        if (!original.contains(DataComponentTypes.FOOD)) {
+        if (!original.has(DataComponents.FOOD)) {
             return client;
         }
-        FoodComponent FOOD = original.get(DataComponentTypes.FOOD);
-        LoreComponent LORE;
-        if (client.contains(DataComponentTypes.LORE)) {
-            LORE = client.get(DataComponentTypes.LORE);
+        FoodProperties FOOD = original.get(DataComponents.FOOD);
+        ItemLore LORE;
+        if (client.has(DataComponents.LORE)) {
+            LORE = client.get(DataComponents.LORE);
         } else {
-            LORE = new LoreComponent(List.of());
+            LORE = new ItemLore(List.of());
         }
 
         assert FOOD != null;
 
-        Text hungerText = getHungerText(FOOD.nutrition(), context);
-        Text saturationText = getSaturationText(FOOD.saturation(), context);
+        Component hungerText = getHungerText(FOOD.nutrition(), context);
+        Component saturationText = getSaturationText(FOOD.saturation(), context);
 
-        LORE = LORE.with(hungerText).with(saturationText);
-        client.set(DataComponentTypes.LORE, LORE);
+        assert LORE != null;
+        LORE = LORE.withLineAdded(hungerText).withLineAdded(saturationText);
+        client.set(DataComponents.LORE, LORE);
         return client;
     }
 
-    private static Text getHungerText(int hunger, PacketContext context) {
+    private static Component getHungerText(int hunger, PacketContext context) {
         return getHungerRelatedText(hunger/2f, context, DEFAULT_HUNGER_SYMBOL, HUNGER_SYMBOL, HUNGER_HALF_SYMBOL, COMPLETE_HUNGER_STYLE, HUNGER_STYLE);
     }
 
-    private static Text getSaturationText(float saturation, PacketContext context) {
+    private static Component getSaturationText(float saturation, PacketContext context) {
         return getHungerRelatedText(saturation/2f, context, DEFAULT_HUNGER_SYMBOL, SATURATION_SYMBOL, SATURATION_HALF_SYMBOL, COMPLETE_SATURATION_STYLE, SATURATION_STYLE);
     }
 
-    private static Text getHungerRelatedText(float number, PacketContext context, String defaultSymbol, char symbol, char half_symbol, Style completeStyle, Style colorOnlyStyle) {
+    private static Component getHungerRelatedText(float number, PacketContext context, String defaultSymbol, char symbol, char half_symbol, Style completeStyle, Style colorOnlyStyle) {
         if (!PolymerResourcePackUtils.hasMainPack(context)) {
-            return ((MutableText)Text.of(defaultSymbol)).setStyle(colorOnlyStyle).append(getNumberText(number));
+            return Component.literal(defaultSymbol).setStyle(colorOnlyStyle).append(getNumberText(number));
         }
         if (number > 6 || number <= 0) {
-            return ((MutableText)Text.of(String.valueOf(symbol))).setStyle(completeStyle).append(getNumberText(number));
+            return Component.literal(String.valueOf(symbol)).setStyle(completeStyle).append(getNumberText(number));
         }
         StringBuilder builder = new StringBuilder();
         int intNumber = (int)(number*2);
@@ -94,14 +98,14 @@ public class Polynutrition implements ModInitializer {
             builder.append(half_symbol);
         }
         if (builder.isEmpty()) {
-            return Text.empty();
+            return Component.empty();
         }
-        return Text.of(builder.toString()).getWithStyle(completeStyle).getFirst();
+        return Component.literal(builder.toString()).setStyle(completeStyle);
     }
 
 
-    private static Text getNumberText(float number) {
-        return Text.of(String.format(" x %.2f", number)).getWithStyle(WHITE_STYLE).getFirst();
+    private static Component getNumberText(float number) {
+        return Component.literal(String.format(" x %.2f", number)).setStyle(WHITE_STYLE);
     }
 
 
