@@ -35,7 +35,7 @@ dependencies {
 	implementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
 
 	// PolyBars
-	implementation "xyz.elytrafae.mc:PolyBars:1.0.0+26.2"
+	implementation "xyz.elytrafae.mc:PolyBars:${project.polybars_version}"
 }
 
 processResources {
@@ -43,13 +43,15 @@ processResources {
 	inputs.property "minecraft_version", project.minecraft_version
 	inputs.property "loader_version", project.loader_version
 	inputs.property "polymer_version", project.polymer_version
+	inputs.property "polybars_version", project.polybars_version
 	filteringCharset "UTF-8"
 
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version,
 				"minecraft_version": project.minecraft_version,
 				"loader_version": project.loader_version,
-				"polymer_version": project.polymer_version
+				"polymer_version": project.polymer_version,
+				"polybars_version": project.polybars_version
 	}
 }
 
