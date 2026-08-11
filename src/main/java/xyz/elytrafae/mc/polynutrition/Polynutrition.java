@@ -17,6 +17,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
+import xyz.elytrafae.mc.polybars.api.PolyBarsApi;
 
 import java.util.List;
 
@@ -44,10 +45,12 @@ public class Polynutrition implements ModInitializer {
 
         PolymerResourcePackUtils.addModAssets(MODID);
 
-        ServerPlayerEvents.JOIN.register(HUDManagerInstanceHolder::onJoin);
-        ServerPlayerEvents.LEAVE.register(HUDManagerInstanceHolder::onLeave);
-        ServerPlayerEvents.COPY_FROM.register(HUDManagerInstanceHolder::onCopyData);
-        ServerTickEvents.START_SERVER_TICK.register(HUDManagerInstanceHolder::tickAll);
+        PolyBarsApi.registerBar(
+                Identifier.fromNamespaceAndPath("polybars", "food"),
+                new HungerBarWithSaturation(
+                        Identifier.fromNamespaceAndPath(MODID, "food"),
+                        Identifier.fromNamespaceAndPath(MODID, "textures/bars/"),
+                        12));
     }
 
     public ItemStack modifyClientItem(ItemStack original, ItemStack client, PacketContext context) {

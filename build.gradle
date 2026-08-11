@@ -13,6 +13,7 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 
+	mavenLocal()
 	mavenCentral()
 	maven { url 'https://maven.nucleoid.xyz' }
 }
@@ -32,6 +33,9 @@ dependencies {
 	implementation "eu.pb4:polymer-resource-pack-extras:${project.polymer_version}"
 	implementation "eu.pb4:polymer-autohost:${project.polymer_version}"
 	implementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
+
+	// PolyBars
+	implementation "xyz.elytrafae.mc:PolyBars:1.0.0+26.2"
 }
 
 processResources {
